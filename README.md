@@ -51,7 +51,11 @@
 - [Getting Started](#getting-started)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
-- [Usage](#usage)
+- [REST API](#rest-api)
+	- [Vision AI](#vision-ai)
+	- [Voice AI](#voice-ai)
+	- [Hearing AI](#hearing-ai)
+- [Javascript SDK](#usage)
 	- [Astica Vision](#using-asticavision)
 	- [Astica Listen (Remote)](#using-asticalisten-with-remote-file)
 	- [Astica Listen (Local)](#using-asticalisten-with-local-file)
@@ -107,8 +111,238 @@ _Get started by including the astica.api.js within your project._
    ```js
    asticaAPI_start('API KEY HERE'); //only needs to be called once.      
    ```
-   
-## Usage
+## REST API
+### Vision AI
+Node
+```JS
+const axios = require('axios'); //npm install axios
+const fs = require('fs'); // Only needed for Input Method 2
+//Input Method 1: https URL of a jpg/png image (faster)
+var astica_input = 'https://astica.ai/example/asticaVision_sample.jpg';
+
+const requestData = {
+  tkn: 'API KEY HERE',  // //visit https://astica.ai
+  modelVersion: '2.1_full',         ////1.0_full, 2.0_full, or 2.1_full
+  input: astica_input,
+  visionParams: 'description,tags', //comma separated, see below
+};
+
+axios({
+    method: 'post',
+    url: 'https://vision.astica.ai/describe',
+    data: requestData,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+}).then((response) => {
+    console.log(response.data);
+}).catch((error) => {
+    console.log(error);
+});
+```
+PHP
+```PHP
+$asticaAPI_key = 'YOUR API KEY'; //visit https://astica.ai
+$asticaAPI_timeout = 60; // seconds Using "gpt" or "gpt_detailed" will increase response time.
+
+$asticaAPI_endpoint = 'https://vision.astica.ai/describe';
+$asticaAPI_modelVersion = '2.1_full'; //1.0_full or 2.0_full
+
+//Input Method 1: https URL of a jpg/png image (faster)
+$asticaAPI_input = 'https://astica.ai/example/asticaVision_sample.jpg';
+
+$asticaAPI_visionParams = 'objects, faces'; //comma separated options; leave blank for all; note "gpt" and "gpt_detailed" are slow.
+
+$asticaAPI_payload = [
+    'tkn' => $asticaAPI_key,
+    'modelVersion' => $asticaAPI_modelVersion,
+    'visionParams' => $asticaAPI_visionParams,
+    'input' => $asticaAPI_input,
+];
+
+// Call API function and store result
+$result = asticaAPI($asticaAPI_endpoint, $asticaAPI_payload, $asticaAPI_timeout);
+```
+Python
+```Python
+import requests
+import json
+import base64
+import os
+
+def asticaAPI(endpoint, payload, timeout):
+    response = requests.post(endpoint, data=json.dumps(payload), timeout=timeout, headers={ 'Content-Type': 'application/json', })
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return {'status': 'error', 'error': 'Failed to connect to the API.'}
+
+asticaAPI_key = 'YOUR API KEY' # visit https://astica.ai
+asticaAPI_timeout = 35 # seconds  Using "gpt" or "gpt_detailed" will increase response time.
+
+asticaAPI_endpoint = 'https://vision.astica.ai/describe'
+asticaAPI_modelVersion = '2.1_full' # '1.0_full' or '2.0_full'
+
+#Input Method 1: https URL of a jpg/png image (faster)
+asticaAPI_input = 'https://astica.ai/example/asticaVision_sample.jpg' 
+```
+### Voice AI
+Node
+```JS
+
+```
+PHP
+```PHP
+$asticaAPI_key = 'YOUR API KEY'; //visit https://astica.ai
+$asticaAPI_timeout = 25; // seconds
+
+$asticaAPI_endpoint = 'https://listen.astica.ai/transcribe';
+$asticaAPI_modelVersion = '1.0_full';
+
+$asticaAPI_doStream = 0; //Determines whether to display responses in real-time.
+$asticaAPI_low_priority = 0; //Lower costs by receiving a URL to query for results. 
+    
+$asticaAPI_input = 'https://astica.ai/example/asticaListen_sample.wav';
+
+// Define payload array
+$asticaAPI_payload = [
+    'tkn' => $asticaAPI_key,
+    'modelVersion' => $asticaAPI_modelVersion,
+    'input' => $asticaAPI_input,
+    'doStream' => $asticaAPI_doStream,
+    'low_priority' => $asticaAPI_low_priority
+];
+
+// Call API function and store result
+$asticaAPI_result = asticaAPI($asticaAPI_endpoint, $asticaAPI_payload, $asticaAPI_timeout);
+
+    
+    
+        //Handle asticaAPI response
+    if(isset($asticaAPI_result['status'])) {
+        // Output Error if exists    
+       if($asticaAPI_result['status'] == 'error') {        
+            echo '<b>Output:</b><br> ' . $asticaAPI_result['error'];
+        } 
+        // Output Success if exists
+        if($asticaAPI_result['status'] == 'success') {     
+            if(isset($asticaAPI_result['resultURI'])) {  
+                echo '<b>Output URI:</b><br> ' . $asticaAPI_result['resultURI'];
+                echo '<br><p>Query this URL to obtain the output of your results';               
+            } else {
+                echo '<b>Output:</b><br> ' . $asticaAPI_result['text'];
+            }    
+        }
+    } else { echo 'Invalid response'; }        
+    
+    echo '<hr><b>astica API Output:</b><br>'; 
+    print_r($asticaAPI_result);
+
+    // Define API function
+    function asticaAPI($endpoint, $payload, $timeout = 15) {
+        // Initialize cURL session
+        $ch = curl_init();
+        $payload = json_encode($payload);
+        // Set cURL options
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $endpoint,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_CONNECTTIMEOUT => $timeout,
+            CURLOPT_TIMEOUT => $timeout,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json; charset=utf-8',
+                'Content-Length: ' . strlen($payload),
+                'Accept: application/json'
+            ]
+        ]);
+        
+        // Execute cURL request
+        $response = curl_exec($ch);
+        
+        // Check for cURL errors
+        if (curl_errno($ch)) {
+            return curl_error($ch);
+        }
+        
+        // Close cURL session
+        curl_close($ch);
+        
+        // Decode JSON response and return
+        return json_decode($response, true);
+    }
+```
+Python
+```Python
+import requests
+import json
+
+def asticaAPI(endpoint, payload, timeout):
+    response = requests.post(endpoint, data=json.dumps(payload), timeout=timeout, headers={ 'Content-Type': 'application/json', })
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return {'status': 'error', 'error': 'Failed to connect to the API.'}
+
+asticaAPI_key = 'YOUR API KEY' # visit https://astica.ai
+asticaAPI_timeout = 25 # seconds
+
+asticaAPI_endpoint = 'https://listen.astica.ai/transcribe'
+asticaAPI_modelVersion = '1.0_full'
+
+asticaAPI_doStream = 0 # Determines whether to display responses in real-time.
+asticaAPI_low_priority = 0 # Lower costs by receiving a URL to query for results. 
+
+asticaAPI_input = 'https://astica.ai/example/asticaListen_sample.wav'
+
+# Define payload dictionary
+asticaAPI_payload = {
+    'tkn': asticaAPI_key,
+    'modelVersion': asticaAPI_modelVersion,
+    'input': asticaAPI_input,
+    'doStream': asticaAPI_doStream,
+    'low_priority': asticaAPI_low_priority
+}
+
+
+# Call API function and store result
+asticaAPI_result = asticaAPI(asticaAPI_endpoint, asticaAPI_payload, asticaAPI_timeout)
+
+print('<hr><b>astica API Output:</b><br>')
+print(json.dumps(asticaAPI_result, indent=4))
+
+#Handle asticaAPI response
+if 'status' in asticaAPI_result:
+    # Output Error if exists    
+    if asticaAPI_result['status'] == 'error':
+        print('Output:', asticaAPI_result['error'])
+    # Output Success if exists
+    if asticaAPI_result['status'] == 'success':
+        if 'resultURI' in asticaAPI_result:
+            print('Output URI:', asticaAPI_result['resultURI'])
+            print('Query this URL to obtain the output of your results')
+        else:
+            print('Output:', asticaAPI_result['text'])
+else:
+    print('Invalid response')
+```
+### Hearing AI
+Node
+```JS
+
+```
+PHP
+```PHP
+
+```
+Python
+```Python
+
+```
+
+## Javascript SDK Usage
 #### Using asticaVision:
 
 
