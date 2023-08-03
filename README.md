@@ -47,11 +47,22 @@
 
 
 
-
+## Table of Contents
+- [Getting Started](#getting-started)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Usage](#usage)
+	- [Astica Vision](#using-asticavision)
+	- [Astica Listen (Remote)](#using-asticalisten-with-remote-file)
+	- [Astica Listen (Local)](#using-asticalisten-with-local-file)
+	- [Astica Voice](#using-asticavoice)
+	- [Astica GPT](#using-asticagpt)
+- [Contact](#contact)
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
+### Prerequisites
 These demonstrations require an API key for the astica.ai cognitive API. You can register and get your key instantly.
 
 ### Quick Start
@@ -97,7 +108,8 @@ _Get started by including the astica.api.js within your project._
    asticaAPI_start('API KEY HERE'); //only needs to be called once.      
    ```
    
-4. Using asticaVision:
+## Usage
+#### Using asticaVision:
 
 
 
@@ -129,7 +141,7 @@ _Get started by including the astica.api.js within your project._
     </script>
    ```
    
-5. Using asticaListen with remote File:
+#### Using asticaListen with remote File:
 
 
    ```js
@@ -168,7 +180,7 @@ _Get started by including the astica.api.js within your project._
     </script>
    ```
    
-6. Using asticaListen with local File:
+#### Using asticaListen with local File:
 
 
    ```js
@@ -195,7 +207,7 @@ _Get started by including the astica.api.js within your project._
 
    ```
    
-7. Using asticaVoice:
+#### Using asticaVoice:
 
 
    ```js
@@ -238,7 +250,7 @@ _Get started by including the astica.api.js within your project._
     </script>
    ```
 
-7. Using asticaGPT:
+#### Using asticaGPT:
 
 
    ```js
